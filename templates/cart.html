@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Your Cart</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header><h1>Your Cart</h1></header>
+
+  <div class="grid">
+    {% for item in cart_items %}
+  <div class="card">
+    <h2>{{ item.name }}</h2>
+    <p class="price">${{ item.price }}</p>
+    <a href="{{ url_for('remove_from_cart', position=loop.index0) }}"><button>Remove</button></a>
+  </div>
+    {% endfor %}
+  </div>
+
+  <p style="text-align:center"><strong>Total: ${{ total }}</strong></p>
+  <p style="text-align:center"><a href="{{ url_for('home') }}">Keep shopping</a></p>
+  <p style="text-align:center"><a href="{{ url_for('clear_cart') }}">Clear cart</a></p>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header><h1>Add a Product</h1></header>
+
+  <form method="POST" style="max-width:350px; margin:30px auto; display:flex; flex-direction:column; gap:12px;">
+    <input name="name" placeholder="Product name" required>
+    <input name="price" type="number" placeholder="Price" required>
+    <input name="image" placeholder="Image filename, e.g. cap.jpg" required>
+    <button type="submit">Add product</button>
+  </form>
+<div style="max-width:350px; margin:30px auto;">
+  <h2>Current products</h2>
+  {% for item in items %}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0;">
+      <span>{{ item.name }} (${{ item.price }})</span>
+      <form method="POST" action="{{ url_for('delete_product', product_id=item.id) }}" onsubmit="return confirm('Delete {{ item.name }}?');">
+        <button type="submit">Delete</button>
+      </form>
+    </div>
+  {% endfor %}
+</div>
+  <p style="text-align:center"><a href="{{ url_for('home') }}">Back to shop</a></p>
+  <p style="text-align:center"><a href="{{ url_for('logout') }}">Log out</a></p>
+</body>
+</html>
