@@ -42,24 +42,41 @@ def get_valid_cart():
 def cart():
     products = {p["id"]: p for p in get_products()}
     cart_ids = get_valid_cart()
-    cart_items = [products[i] for i in cart_ids if i in products]
-    total = sum(item["price"] for item in cart_items)
+
+    counts = {}
+    for i in cart_ids:
+        counts[i] = counts.get(i, 0) + 1
+
+    cart_items = []
+    total = 0
+    for product_id, qty in counts.items():
+        product = products[product_id]
+        subtotal = product["price"] * qty
+        total += subtotal
+        cart_items.append({
+            "id": product_id,
+            "name": product["name"],
+            "price": product["price"],
+            "qty": qty,
+            "subtotal": subtotal,
+        })
+
     return render_template("cart.html", cart_items=cart_items, total=total)
 
 
 @app.route("/add/<int:item_id>")
 def add_to_cart(item_id):
-    cart = session.get("cart", [])
+    cart = get_valid_cart()
     cart.append(item_id)
     session["cart"] = cart
-    return redirect(url_for("home"))
+    return redirect(request.referrer or url_for("home"))
 
 
-@app.route("/remove/<int:position>")
-def remove_from_cart(position):
+@app.route("/remove/<int:product_id>")
+def remove_from_cart(product_id):
     cart = get_valid_cart()
-    if 0 <= position < len(cart):
-        cart.pop(position)
+    if product_id in cart:
+        cart.remove(product_id)
         session["cart"] = cart
     return redirect(url_for("cart"))
 
