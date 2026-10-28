@@ -11,6 +11,21 @@ app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
+def init_db():
+    conn = sqlite3.connect("shop.db")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            price INTEGER NOT NULL,
+            image TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+init_db()
+
 def admin_required(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
