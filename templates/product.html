@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ item.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>{{ item.name }}</h1>
+    <p><a href="{{ url_for('cart') }}" style="color:white">Cart: {{ cart_count }} items</a></p>
+  </header>
+
+  <div class="grid">
+    <div class="card" style="width:340px;">
+      <img class="pic" style="height:320px;" src="{{ url_for('static', filename='images/' + item.image) }}" alt="{{ item.name }}">
+      <h2>{{ item.name }}</h2>
+      <p class="price">${{ item.price }}</p>
+      <a href="{{ url_for('add_to_cart', item_id=item.id) }}"><button>Add to cart</button></a>
+    </div>
+  </div>
+
+  <p style="text-align:center"><a href="{{ url_for('home') }}">Back to shop</a></p>
+</body>
+</html>

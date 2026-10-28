@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template,redirect, url_for, session, request, flash
+from flask import Flask, render_template,redirect, url_for, session, request, flash, abort
 from functools import wraps
 import os
 from dotenv import load_dotenv
@@ -110,6 +110,18 @@ def login():
 def logout():
     session.pop("is_admin", None)
     return redirect(url_for("home"))
+
+@app.route("/product/<int:product_id>")
+def product(product_id):
+    conn = sqlite3.connect("shop.db")
+    conn.row_factory = sqlite3.Row
+    item = conn.execute(
+        "SELECT * FROM products WHERE id = ?", (product_id,)
+    ).fetchone()
+    conn.close()
+    if item is None:
+        abort(404)
+    return render_template("product.html", item=item, cart_count=len(get_valid_cart()))
 
 if __name__ == "__main__":
     app.run(debug=True)
