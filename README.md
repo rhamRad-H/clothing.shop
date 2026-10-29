@@ -1,6 +1,7 @@
 # Clothing Shop
 
 A small online clothing store built with Flask and SQLite.
+**Live demo:** https://cocolona.pythonanywhere.com
 
 ## Features
 
