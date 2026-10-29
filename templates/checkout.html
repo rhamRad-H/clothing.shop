@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header><h1>Checkout</h1></header>
+
+  <div style="max-width:350px; margin:30px auto;">
+    {% for item in cart_items %}
+      <p>{{ item.name }} x{{ item.qty }} <span style="float:right">${{ item.subtotal }}</span></p>
+    {% endfor %}
+    <p><strong>Total: ${{ total }}</strong></p>
+  </div>
+
+  <form method="POST" style="max-width:350px; margin:0 auto; display:flex; flex-direction:column; gap:12px;">
+    <input name="name" placeholder="Full name" required>
+    <textarea name="address" placeholder="Delivery address" rows="3" required></textarea>
+    <button type="submit">Place order</button>
+  </form>
+
+  <p style="text-align:center"><a href="{{ url_for('cart') }}">Back to cart</a></p>
+</body>
+</html>

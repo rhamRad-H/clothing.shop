@@ -21,6 +21,16 @@ def init_db():
             image TEXT NOT NULL
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            address TEXT NOT NULL,
+            items TEXT NOT NULL,
+            total INTEGER NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -37,13 +47,25 @@ def admin_required(view):
 
 @app.route("/")
 def home():
+    q = request.args.get("q", "").strip()
+    products = search_products(q) if q else get_products()
     cart_count = len(get_valid_cart())
-    return render_template("index.html", items=get_products(), cart_count=cart_count)
+    return render_template("index.html", items=products, cart_count=cart_count, q=q)
 
 def get_products():
     conn = sqlite3.connect("shop.db")
     conn.row_factory = sqlite3.Row
     rows = conn.execute("SELECT * FROM products").fetchall()
+    conn.close()
+    return rows
+
+def search_products(query):
+    conn = sqlite3.connect("shop.db")
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(
+        "SELECT * FROM products WHERE name LIKE ?",
+        (f"%{query}%",),
+    ).fetchall()
     conn.close()
     return rows
 
@@ -53,13 +75,10 @@ def get_valid_cart():
     session["cart"] = cart
     return cart
 
-@app.route("/cart")
-def cart():
+def build_cart():
     products = {p["id"]: p for p in get_products()}
-    cart_ids = get_valid_cart()
-
     counts = {}
-    for i in cart_ids:
+    for i in get_valid_cart():
         counts[i] = counts.get(i, 0) + 1
 
     cart_items = []
@@ -75,7 +94,11 @@ def cart():
             "qty": qty,
             "subtotal": subtotal,
         })
+    return cart_items, total
 
+@app.route("/cart")
+def cart():
+    cart_items, total = build_cart()
     return render_template("cart.html", cart_items=cart_items, total=total)
 
 
@@ -154,6 +177,39 @@ def product(product_id):
     if item is None:
         abort(404)
     return render_template("product.html", item=item, cart_count=len(get_valid_cart()))
+
+@app.route("/checkout", methods=["GET", "POST"])
+def checkout():
+    cart_items, total = build_cart()
+    if not cart_items:
+        return redirect(url_for("cart"))
+
+    if request.method == "POST":
+        name = request.form["name"].strip()
+        address = request.form["address"].strip()
+        summary = ", ".join(f"{i['name']} x{i['qty']}" for i in cart_items)
+
+        conn = sqlite3.connect("shop.db")
+        conn.execute(
+            "INSERT INTO orders (name, address, items, total) VALUES (?, ?, ?, ?)",
+            (name, address, summary, total),
+        )
+        conn.commit()
+        conn.close()
+
+        session["cart"] = []
+        return render_template("order_done.html", name=name, total=total)
+
+    return render_template("checkout.html", cart_items=cart_items, total=total)
+
+@app.route("/orders")
+@admin_required
+def orders():
+    conn = sqlite3.connect("shop.db")
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute("SELECT * FROM orders ORDER BY id DESC").fetchall()
+    conn.close()
+    return render_template("orders.html", orders=rows)
 
 if __name__ == "__main__":
     app.run(debug=True)

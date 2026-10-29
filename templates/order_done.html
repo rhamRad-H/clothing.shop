@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order placed</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header><h1>Thank you, {{ name }}!</h1></header>
+  <p style="text-align:center">Your order of ${{ total }} was received.</p>
+  <p style="text-align:center"><a href="{{ url_for('home') }}">Back to shop</a></p>
+</body>
+</html>

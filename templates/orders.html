@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Orders</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header><h1>Orders</h1></header>
+
+  <div style="max-width:500px; margin:30px auto;">
+    {% for order in orders %}
+      <div class="card" style="width:auto; margin-bottom:15px; text-align:left;">
+        <p><strong>Order #{{ order.id }}</strong> · {{ order.created_at }}</p>
+        <p>{{ order.name }}</p>
+        <p>{{ order.address }}</p>
+        <p>{{ order["items"] }}</p>
+        <p class="price">Total: ${{ order.total }}</p>
+      </div>
+    {% else %}
+      <p style="text-align:center">No orders yet.</p>
+    {% endfor %}
+  </div>
+
+  <p style="text-align:center"><a href="{{ url_for('admin') }}">Back to admin</a></p>
+</body>
+</html>
