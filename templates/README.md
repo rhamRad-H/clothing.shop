@@ -7,7 +7,7 @@ A small online clothing store built with Flask and SQLite.
 - Product listing with photos, search, and a detail page for each product
 - Shopping cart with quantities, subtotals, and a live total
 - Checkout form that saves orders to a database
-- Admin area with a password login: add and delete products, view orders, mark orders as shipped
+- Admin area with a password login: add and delete products, view orders, mark orders as shippedd
 
 ## Built with
 
