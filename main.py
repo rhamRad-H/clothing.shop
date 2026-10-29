@@ -28,6 +28,7 @@ def init_db():
             address TEXT NOT NULL,
             items TEXT NOT NULL,
             total INTEGER NOT NULL,
+            status TEXT DEFAULT 'new',
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -210,6 +211,15 @@ def orders():
     rows = conn.execute("SELECT * FROM orders ORDER BY id DESC").fetchall()
     conn.close()
     return render_template("orders.html", orders=rows)
+
+@app.route("/ship/<int:order_id>", methods=["POST"])
+@admin_required
+def ship_order(order_id):
+    conn = sqlite3.connect("shop.db")
+    conn.execute("UPDATE orders SET status = 'shipped' WHERE id = ?", (order_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for("orders"))
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -15,6 +15,12 @@
         <p>{{ order.address }}</p>
         <p>{{ order["items"] }}</p>
         <p class="price">Total: ${{ order.total }}</p>
+        <p>Status: <strong>{{ order.status }}</strong></p>
+        {% if order.status != 'shipped' %}
+            <form method="POST" action="{{ url_for('ship_order', order_id=order.id) }}">
+                <button type="submit">Mark as shipped</button>
+            </form>
+        {% endif %}
       </div>
     {% else %}
       <p style="text-align:center">No orders yet.</p>
